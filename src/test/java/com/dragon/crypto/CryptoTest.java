@@ -12,24 +12,10 @@ import org.junit.Test;
  * @Date: 2020/3/28 10:31
  * @Version V1.0
  */
-public class CryptoTest {
+public class CryptoTest extends Perform{
     String str = "!@#$%^&*()_+~（）abc 中文";
     String str2_8 = "qweroiuy12345678";
     private String key = "1asssdsdc212";
-
-    long bg;
-    long end;
-
-    @Before
-    public void befor() {
-        bg = System.currentTimeMillis();
-    }
-
-    @After
-    public void after() {
-        end = System.currentTimeMillis();
-        System.out.println("----------all times:>>>" + (end - bg) + " ms");
-    }
 
     void print(String str){
         System.out.println(str);

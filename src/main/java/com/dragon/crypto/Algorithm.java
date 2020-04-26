@@ -20,6 +20,7 @@ public enum Algorithm {
     HmacSHA384("HmacSHA384"),
     HmacSHA512("HmacSHA512"),
     CRC32("CRC32"),
+    DES("DES"),
     DES3("DESede"),
     AES("AES"),
     PBEWithMd5AndDes("PBEWithMD5AndDES"),
