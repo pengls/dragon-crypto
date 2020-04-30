@@ -100,4 +100,11 @@ public class CryptoHelperTest extends Perform{
         System.out.println(miwen);
         System.out.println(CryptoHelper.rsaPublicDecrypt(miwen, keyPairs.getPublicKey()));
     }
+
+    @Test
+    public void t6(){
+        String miwen = CryptoHelper.base64Encode(ming);
+        System.out.println(miwen);
+        System.out.println(CryptoHelper.base64Decode(miwen));
+    }
 }

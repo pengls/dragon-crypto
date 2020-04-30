@@ -16,6 +16,15 @@ import java.nio.charset.StandardCharsets;
 public final class CryptoHelper {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
+    //================= base64 =================//
+    public static String base64Encode(String data) {
+        return Base64.encodeBase64URLSafeString(data.getBytes(DEFAULT_CHARSET));
+    }
+
+    public static String base64Decode(String data){
+        return StrUtils.newStringUtf8(Base64.decodeBase64(data.getBytes(DEFAULT_CHARSET)));
+    }
+
     //================= 摘要算法 =================//
 
     public static String md5(String data) {
