@@ -1,9 +1,12 @@
 package com.dragon.crypto;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * @ClassName: CryptoTest
@@ -12,12 +15,12 @@ import org.junit.Test;
  * @Date: 2020/3/28 10:31
  * @Version V1.0
  */
-public class CryptoTest extends Perform{
+public class CryptoTest extends Perform {
     String str = "!@#$%^&*()_+~（）abc 中文";
     String str2_8 = "qweroiuy12345678";
     private String key = "1asssdsdc212";
 
-    void print(String str){
+    void print(String str) {
         System.out.println(str);
     }
 
@@ -30,7 +33,7 @@ public class CryptoTest extends Perform{
 
     }
 
-   @Test
+    @Test
     public void md5Test() {
         byte[] encryt = CryptoFactory.getCrypto(Algorithm.MD5).encrypt(str.getBytes());
         System.out.println(Hex.encodeHexString(encryt));
@@ -44,7 +47,7 @@ public class CryptoTest extends Perform{
         System.out.println(Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.SHA512).encrypt(str.getBytes())));
     }
 
-   @Test
+    @Test
     public void hmacTest() {
         System.out.println(Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacMD5).encrypt(str.getBytes())));
         System.out.println(Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacSHA1).encrypt(str.getBytes())));
@@ -55,16 +58,40 @@ public class CryptoTest extends Perform{
 
     @Test
     public void aesTest() {
-        String key = "1234567890-=plmkoijnbhuygvcftrdx";
-        String iv = "0okmnji98uyhgbvf";
+        String key = "jskd231*&%";
+        String iv = "29238^%%$ss";
+        String str = "2010202010";
         Crypto aes = CryptoFactory.getCrypto(Algorithm.AES);
         //采用默认key， iv， 工作模式 ，填充方式
-        String defEncry = new String(aes.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
-        System.out.println("默认KEY,IV,工作模式,填充方式加密：" + defEncry);
-        System.out.println("默认KEY,IV,工作模式,填充方式解密：" + aes.decrypt(defEncry.getBytes()));
+        String miwen = Base64.encodeBase64URLSafeString(aes.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
+        System.out.println("默认KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
+        System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8));
+
+        //采用自定义key，iv，工作模式，填充方式
+        miwen = Base64.encodeBase64URLSafeString(aes.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.GCM).padding(CryptoParam.Padding.PKCS5Padding).build()));
+        System.out.println("指定KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
+        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
+                .iv(iv).workModel(CryptoParam.WorkModel.GCM).padding(CryptoParam.Padding.PKCS5Padding).build()), StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void desTest() {
+        String key = "(3)_&*uiku@..!123";
+        String iv = "K*&^%09P..iqx";
+        Crypto aes = CryptoFactory.getCrypto(Algorithm.AES);
+        //采用默认key， iv， 工作模式 ，填充方式
+        String miwen = Base64.encodeBase64URLSafeString(aes.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
+        System.out.println("默认KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
+        System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8));
+
+        //采用自定义key，iv，工作模式，填充方式
+        miwen = Base64.encodeBase64URLSafeString(aes.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()));
+        System.out.println("指定KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
+        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
+                .iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()), StandardCharsets.UTF_8));
     }
     /*
-    *//*@Test
+     *//*@Test
     public void des3Test(){
         String encrypt = CryptoFactory.getCrypto(Algorithm.DES3_ECB).encrypt(str);
         System.out.println(encrypt);

@@ -183,7 +183,8 @@ public class CryptoParam {
         CFB,
         CFB128,
         OFB,
-        OFB128
+        OFB128,
+        GCM
     }
 
     public enum Padding {

@@ -1,7 +1,9 @@
 package com.dragon.crypto;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 
@@ -42,10 +44,12 @@ public abstract class SymmetricCrypto implements Crypto {
      */
     protected static final String CIPHER_SEPARATOR = "/";
 
+    protected static final int TAG_LEN = 16;
+
     protected static final int MIN_KEY_SIZE_32 = 32;
     protected static final int MIN_KEY_SIZE_24 = 24;
-    protected static final int IV_SIZE_16 = 16;
-    protected static final int IV_SIZE_8 = 8;
+    protected static final int MIN_IV_SIZE_16 = 16;
+    protected static final int MIN_IV_SIZE_8 = 8;
 
     @Override
     public byte[] decrypt(byte[] data) {
@@ -74,38 +78,12 @@ public abstract class SymmetricCrypto implements Crypto {
         byte[] data = param.getData();
         Assert.notEmpty(data, "data is null or empty");
         String key = Utils.isBlank(param.getKey()) ? (Algorithm.AES == current() ? DEFAULT_KEY_32 : DEFAULT_KEY_24) : param.getKey();
-        checkKeySize(key);
         param.setKey(key);
 
         String iv = Utils.isBlank(param.getIv()) ? (Algorithm.AES == current() ? DEFAULT_IV_16 : DEFAULT_IV_8) : param.getIv();
-        checkIvSize(iv);
         param.setIv(iv);
 
         return type == 1 ? encry(param) : decry(param);
-    }
-
-    private void checkKeySize(String key) {
-        if (Algorithm.AES == current()) {
-            if (key.length() < MIN_KEY_SIZE_32) {
-                throw new CryptoException("the key size must be greater than or equal to " + MIN_KEY_SIZE_32);
-            }
-        } else if (Algorithm.DES3 == current()) {
-            if (key.length() < MIN_KEY_SIZE_24) {
-                throw new CryptoException("the key size must be greater than or equal to " + MIN_KEY_SIZE_24);
-            }
-        }
-    }
-
-    private void checkIvSize(String iv) {
-        if (Algorithm.AES == current()) {
-            if (iv.length() < IV_SIZE_16) {
-                throw new CryptoException("the iv size must be " + IV_SIZE_16);
-            }
-        } else if (Algorithm.DES3 == current()) {
-            if (iv.length() < IV_SIZE_8) {
-                throw new CryptoException("the iv size must be " + IV_SIZE_8);
-            }
-        }
     }
 
     private byte[] encry(CryptoParam param) {
@@ -130,15 +108,37 @@ public abstract class SymmetricCrypto implements Crypto {
     }
 
     private void initCipher(Cipher cipher, int model, CryptoParam param) throws InvalidKeyException, InvalidAlgorithmParameterException {
-        if (CryptoParam.WorkModel.ECB != param.getWorkModel() && Utils.isBlank(param.getIv())) {
-            throw new CryptoException("when not ECB work model, iv param can not be null!");
+
+        byte[] key = CryptoFactory.getCrypto(Algorithm.SHA256).encrypt(param.getKey().getBytes(DEFAULT_CHARSET));
+        byte[] iv = CryptoFactory.getCrypto(Algorithm.SHA256).encrypt(param.getIv().getBytes(DEFAULT_CHARSET));
+
+        byte[] subKey;
+        if (Algorithm.DES == current() || Algorithm.DES3 == current()) {
+            subKey = new byte[MIN_KEY_SIZE_24];
+            System.arraycopy(key, 0, subKey, 0, MIN_KEY_SIZE_24);
+        }else{
+            subKey = key;
+        }
+
+        byte[] subIv;
+        if (Algorithm.DES == current() || Algorithm.DES3 == current()) {
+            subIv = new byte[MIN_IV_SIZE_8];
+            System.arraycopy(iv, 0, subIv, 0, MIN_IV_SIZE_8);
+        }else{
+            subIv = new byte[MIN_IV_SIZE_16];
+            System.arraycopy(iv, 0, subIv, 0, MIN_IV_SIZE_16);
         }
 
         if (CryptoParam.WorkModel.ECB == param.getWorkModel()) {
-            cipher.init(model, toKey(param.getKey()));
+            cipher.init(model, toKey(subKey));
+        } else if (CryptoParam.WorkModel.GCM == param.getWorkModel()) {
+            GCMParameterSpec gcmPs = new GCMParameterSpec(TAG_LEN * Byte.SIZE, subIv);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(subKey, current().getCode());
+            cipher.init(model, secretKeySpec, gcmPs);
+            cipher.updateAAD(subKey);
         } else {
-            IvParameterSpec ips = new IvParameterSpec(param.getIv().getBytes());
-            cipher.init(model, toKey(param.getKey()), ips);
+            IvParameterSpec ips = new IvParameterSpec(subIv);
+            cipher.init(model, toKey(subKey), ips);
         }
     }
 

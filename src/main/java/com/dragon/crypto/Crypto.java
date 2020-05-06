@@ -2,6 +2,8 @@ package com.dragon.crypto;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @ClassName: Crypto
@@ -15,6 +17,7 @@ public interface Crypto {
      * default key
      */
     String DEFAULT_KEY = "asdi!@#$%^&*~()_+AYHB";
+    Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     /**
      * @MethodName: encryptBytes
@@ -60,6 +63,10 @@ public interface Crypto {
      */
     default SecretKey toKey(final String key) {
         return new SecretKeySpec(key.getBytes(), current().getCode());
+    }
+
+    default SecretKey toKey(final byte[] key) {
+        return new SecretKeySpec(key, current().getCode());
     }
 
     default void warn() {
