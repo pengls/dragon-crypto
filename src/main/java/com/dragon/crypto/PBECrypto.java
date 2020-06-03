@@ -22,7 +22,7 @@ public abstract class PBECrypto implements Crypto {
 
     private static final int SALT_SIZE = 8;
 
-    private static final int CYCLE_TIMES = 100;
+    private static final int CYCLE_TIMES = 1000;
 
     @Override
     public SecretKey toKey(final String key) {
