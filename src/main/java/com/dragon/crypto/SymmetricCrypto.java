@@ -46,10 +46,10 @@ public abstract class SymmetricCrypto implements Crypto {
 
     protected static final int TAG_LEN = 16;
 
-    protected static final int MIN_KEY_SIZE_32 = 32;
-    protected static final int MIN_KEY_SIZE_24 = 24;
-    protected static final int MIN_IV_SIZE_16 = 16;
-    protected static final int MIN_IV_SIZE_8 = 8;
+    protected static final int MIN_KEY_SIZE_DES = 8;
+    protected static final int MIN_KEY_SIZE_DES3 = 24;
+    protected static final int MIN_IV_SIZE_AES = 16;
+    protected static final int MIN_IV_SIZE_DES = 8;
 
     @Override
     public byte[] decrypt(byte[] data) {
@@ -111,22 +111,30 @@ public abstract class SymmetricCrypto implements Crypto {
 
         byte[] key = CryptoFactory.getCrypto(Algorithm.SHA256).encrypt(param.getKey().getBytes(DEFAULT_CHARSET));
         byte[] iv = CryptoFactory.getCrypto(Algorithm.SHA256).encrypt(param.getIv().getBytes(DEFAULT_CHARSET));
+        Algorithm curAlg = current();
 
         byte[] subKey;
-        if (Algorithm.DES == current() || Algorithm.DES3 == current()) {
-            subKey = new byte[MIN_KEY_SIZE_24];
-            System.arraycopy(key, 0, subKey, 0, MIN_KEY_SIZE_24);
+        if (Algorithm.DES3 == curAlg) {
+            subKey = new byte[MIN_KEY_SIZE_DES3];
+            System.arraycopy(key, 0, subKey, 0, MIN_KEY_SIZE_DES3);
+        }else if (Algorithm.DES == curAlg) {
+            subKey = new byte[MIN_KEY_SIZE_DES];
+            System.arraycopy(key, 0, subKey, 0, MIN_KEY_SIZE_DES);
+        }else if (Algorithm.AES == curAlg) {
+            subKey = key;
         }else{
             subKey = key;
         }
 
         byte[] subIv;
         if (Algorithm.DES == current() || Algorithm.DES3 == current()) {
-            subIv = new byte[MIN_IV_SIZE_8];
-            System.arraycopy(iv, 0, subIv, 0, MIN_IV_SIZE_8);
+            subIv = new byte[MIN_IV_SIZE_DES];
+            System.arraycopy(iv, 0, subIv, 0, MIN_IV_SIZE_DES);
+        }else if (Algorithm.AES == curAlg) {
+            subIv = new byte[MIN_IV_SIZE_AES];
+            System.arraycopy(iv, 0, subIv, 0, MIN_IV_SIZE_AES);
         }else{
-            subIv = new byte[MIN_IV_SIZE_16];
-            System.arraycopy(iv, 0, subIv, 0, MIN_IV_SIZE_16);
+            subIv = iv;
         }
 
         if (CryptoParam.WorkModel.ECB == param.getWorkModel()) {

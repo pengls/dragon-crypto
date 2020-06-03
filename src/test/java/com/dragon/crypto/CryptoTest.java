@@ -78,29 +78,36 @@ public class CryptoTest extends Perform {
     public void desTest() {
         String key = "(3)_&*uiku@..!123";
         String iv = "K*&^%09P..iqx";
-        Crypto aes = CryptoFactory.getCrypto(Algorithm.AES);
+        Crypto des = CryptoFactory.getCrypto(Algorithm.DES);
         //采用默认key， iv， 工作模式 ，填充方式
-        String miwen = Base64.encodeBase64URLSafeString(aes.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
+        String miwen = Base64.encodeBase64URLSafeString(des.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
         System.out.println("默认KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
-        System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8));
+        System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8));
 
         //采用自定义key，iv，工作模式，填充方式
-        miwen = Base64.encodeBase64URLSafeString(aes.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()));
+        miwen = Base64.encodeBase64URLSafeString(des.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()));
         System.out.println("指定KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
-        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
+        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
+                .iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()), StandardCharsets.UTF_8));
+    }
+    @Test
+    public void des3Test() {
+        String key = "(3)_&*uiku@..!123";
+        String iv = "K*&^%09P..iqx";
+        Crypto des = CryptoFactory.getCrypto(Algorithm.DES3);
+        //采用默认key， iv， 工作模式 ，填充方式
+        String miwen = Base64.encodeBase64URLSafeString(des.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
+        System.out.println("默认KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
+        System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8));
+
+        //采用自定义key，iv，工作模式，填充方式
+        miwen = Base64.encodeBase64URLSafeString(des.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()));
+        System.out.println("指定KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
+        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
                 .iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()), StandardCharsets.UTF_8));
     }
     /*
-     *//*@Test
-    public void des3Test(){
-        String encrypt = CryptoFactory.getCrypto(Algorithm.DES3_ECB).encrypt(str);
-        System.out.println(encrypt);
-        encrypt = CryptoFactory.getCrypto(Algorithm.DES3_ECB).encrypt(str);
-        System.out.println(encrypt);
-        System.out.println(CryptoFactory.getCrypto(Algorithm.DES3_ECB).decrypt(encrypt));
-        System.out.println(CryptoFactory.getCrypto(Algorithm.DES3_ECB).decrypt(encrypt));
-    }
-
+     *
     @Test
     public void des3Test2(){
         String encrypt = CryptoFactory.getCrypto(Algorithm.DES3_CBC).encrypt(str);
