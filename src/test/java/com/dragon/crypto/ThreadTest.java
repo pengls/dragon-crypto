@@ -16,9 +16,6 @@ import java.util.concurrent.TimeUnit;
  * @Version V1.0
  */
 public class ThreadTest {
-    static ExecutorService threadPool = new ThreadPoolExecutor(2, 5,
-            0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>());
     static String key = "jskd231*&%";
     static String iv = "29238^%%$ss";
     static String str = "2010202010";
@@ -27,24 +24,20 @@ public class ThreadTest {
 
     public static void main(String[] args) throws InterruptedException {
         final int loop = (args == null || args.length == 0) ? 10 : Integer.parseInt(args[0]);
-        final int threads = (args == null || args.length < 2) ? 5 : Integer.parseInt(args[1]);
+        final int threads = (args == null || args.length < 2) ? 10 : Integer.parseInt(args[1]);
         final int encryptType = (args == null || args.length < 3) ? 1 : Integer.parseInt(args[2]);
-
-        for (int i = 0; i < threads; i++) {
+        ExecutorService threadPool = new ThreadPoolExecutor(threads, threads,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>());
+        while (true){
             threadPool.execute(() -> {
-                //while (true) {
-                    if (encryptType == 1) {
-                        encryptAndDecryptByAES(loop);
-                    } else {
-                        encryptAndDecryptByDES(loop);
-                    }
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                //}
+                if (encryptType == 1) {
+                    encryptAndDecryptByAES(loop);
+                } else {
+                    encryptAndDecryptByDES(loop);
+                }
             });
+            Thread.sleep(1000);
         }
 
     }
