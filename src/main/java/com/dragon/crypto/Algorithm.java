@@ -27,6 +27,9 @@ public enum Algorithm {
     PBEWithMd5AndTripleDES("PBEWithMD5AndTripleDES"),
     PBEWithSHA1AndDESede("PBEWithSHA1AndDESede"),
     PBEWithSHA1AndRC2_40("PBEWithSHA1AndRC2_40"),
+    PBKDF2WithHmacSHA512("PBKDF2WithHmacSHA512"),
+    PBKDF2WithHmacSHA256("PBKDF2WithHmacSHA256"),
+    PBKDF2WithHmacSHA1("PBKDF2WithHmacSHA1"),
     RSA("RSA");
 
     private String code;

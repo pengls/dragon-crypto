@@ -61,6 +61,20 @@ public final class CryptoHelper {
         return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacSHA512).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).key(key).build()));
     }
 
+    //================= 摘要算法 带salt =================//
+
+    public static String pbkdf2WithHmacSHA256(String data, String salt) {
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA256).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt).build()));
+    }
+
+    public static String pbkdf2WithHmacSHA512(String data, String salt) {
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA512).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt).build()));
+    }
+
+    public static String pbkdf2WithHmacSHA1(String data, String salt) {
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA1).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt).build()));
+    }
+
     //================= 对称加密/解密 工作模式 向量  填充方式 =================//
 
     /**
