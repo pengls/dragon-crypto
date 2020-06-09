@@ -1,5 +1,9 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.BasicBuilder;
+import com.dragon.crypto.builder.PBEBuilder;
+import com.dragon.crypto.builder.SymmetricBuilder;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
@@ -53,76 +57,78 @@ public abstract class SymmetricCrypto implements Crypto {
 
     @Override
     public byte[] decrypt(byte[] data) {
-        return crypt(CryptoParam.builder().data(data).build(), 2);
+        return crypt(new SymmetricBuilder().data(data), 2);
     }
 
 
     @Override
     public byte[] encrypt(byte[] data) {
-        return crypt(CryptoParam.builder().data(data).build(), 1);
+        return crypt(new SymmetricBuilder().data(data), 1);
     }
 
 
     @Override
-    public byte[] decrypt(CryptoParam param) {
-        return crypt(param, 2);
+    public byte[] decrypt(BasicBuilder builder) {
+        return crypt(builder, 2);
     }
 
 
     @Override
-    public byte[] encrypt(CryptoParam param) {
-        return crypt(param, 1);
+    public byte[] encrypt(BasicBuilder builder) {
+        return crypt(builder, 1);
     }
 
-    private byte[] crypt(CryptoParam param, int type) {
-        byte[] data = param.getData();
+    private byte[] crypt(BasicBuilder builder, int type) {
+        Assert.isInstanceOf(SymmetricBuilder.class, builder, "please use SymmetricBuilder build params.");
+        SymmetricBuilder symmetricBuilder = (SymmetricBuilder) builder;
+        byte[] data = symmetricBuilder.getData();
         Assert.notEmpty(data, "data is null or empty");
-        String key = Utils.isBlank(param.getKey()) ? (Algorithm.AES == current() ? DEFAULT_KEY_32 : DEFAULT_KEY_24) : param.getKey();
-        param.setKey(key);
+        String key = Utils.isBlank(symmetricBuilder.getKey()) ? (Algorithm.AES == current() ? DEFAULT_KEY_32 : DEFAULT_KEY_24) : symmetricBuilder.getKey();
+        symmetricBuilder.setKey(key);
 
-        String iv = Utils.isBlank(param.getIv()) ? (Algorithm.AES == current() ? DEFAULT_IV_16 : DEFAULT_IV_8) : param.getIv();
-        param.setIv(iv);
+        String iv = Utils.isBlank(symmetricBuilder.getIv()) ? (Algorithm.AES == current() ? DEFAULT_IV_16 : DEFAULT_IV_8) : symmetricBuilder.getIv();
+        symmetricBuilder.setIv(iv);
 
-        return type == 1 ? encry(param) : decry(param);
+        return type == 1 ? encry(symmetricBuilder) : decry(symmetricBuilder);
     }
 
-    private byte[] encry(CryptoParam param) {
+    private byte[] encry(SymmetricBuilder symmetricBuilder) {
         try {
-            Cipher cipher = Cipher.getInstance(current().getCode() + CIPHER_SEPARATOR + param.getWorkModel() + CIPHER_SEPARATOR + param.getPadding());
-            initCipher(cipher, Cipher.ENCRYPT_MODE, param);
-            return cipher.doFinal(param.getData());
+            Cipher cipher = Cipher.getInstance(current().getCode() + CIPHER_SEPARATOR + symmetricBuilder.getWorkModel() + CIPHER_SEPARATOR + symmetricBuilder.getPadding());
+            initCipher(cipher, Cipher.ENCRYPT_MODE, symmetricBuilder);
+            return cipher.doFinal(symmetricBuilder.getData());
         } catch (Exception e) {
             e.printStackTrace();
             throw new CryptoException(e.getMessage());
         }
     }
 
-    private byte[] decry(CryptoParam param) {
+    private byte[] decry(SymmetricBuilder symmetricBuilder) {
         try {
-            Cipher cipher = Cipher.getInstance(current().getCode() + CIPHER_SEPARATOR + param.getWorkModel() + CIPHER_SEPARATOR + param.getPadding());
-            initCipher(cipher, Cipher.DECRYPT_MODE, param);
-            return cipher.doFinal(param.getData());
+            Cipher cipher = Cipher.getInstance(current().getCode() + CIPHER_SEPARATOR + symmetricBuilder.getWorkModel() + CIPHER_SEPARATOR + symmetricBuilder.getPadding());
+            initCipher(cipher, Cipher.DECRYPT_MODE, symmetricBuilder);
+            return cipher.doFinal(symmetricBuilder.getData());
         } catch (Exception e) {
             throw new CryptoException(e.getMessage());
         }
     }
 
-    private void initCipher(Cipher cipher, int model, CryptoParam param) throws InvalidKeyException, InvalidAlgorithmParameterException {
+    private void initCipher(Cipher cipher, int model, SymmetricBuilder symmetricBuilder) throws InvalidKeyException, InvalidAlgorithmParameterException {
 
-        byte[] key = CryptoFactory.getCrypto(Algorithm.SHA256).encrypt(param.getKey().getBytes(DEFAULT_CHARSET));
-        byte[] iv = CryptoFactory.getCrypto(Algorithm.SHA256).encrypt(param.getIv().getBytes(DEFAULT_CHARSET));
+        byte[] key = CryptoFactory.getCrypto(Algorithm.SHA256).encrypt(symmetricBuilder.getKey().getBytes(DEFAULT_CHARSET));
+        byte[] iv = CryptoFactory.getCrypto(Algorithm.SHA256).encrypt(symmetricBuilder.getIv().getBytes(DEFAULT_CHARSET));
         Algorithm curAlg = current();
 
         byte[] subKey;
         if (Algorithm.DES3 == curAlg) {
             subKey = new byte[MIN_KEY_SIZE_DES3];
             System.arraycopy(key, 0, subKey, 0, MIN_KEY_SIZE_DES3);
-        }else if (Algorithm.DES == curAlg) {
+        } else if (Algorithm.DES == curAlg) {
             subKey = new byte[MIN_KEY_SIZE_DES];
             System.arraycopy(key, 0, subKey, 0, MIN_KEY_SIZE_DES);
-        }else if (Algorithm.AES == curAlg) {
+        } else if (Algorithm.AES == curAlg) {
             subKey = key;
-        }else{
+        } else {
             subKey = key;
         }
 
@@ -130,16 +136,16 @@ public abstract class SymmetricCrypto implements Crypto {
         if (Algorithm.DES == current() || Algorithm.DES3 == current()) {
             subIv = new byte[MIN_IV_SIZE_DES];
             System.arraycopy(iv, 0, subIv, 0, MIN_IV_SIZE_DES);
-        }else if (Algorithm.AES == curAlg) {
+        } else if (Algorithm.AES == curAlg) {
             subIv = new byte[MIN_IV_SIZE_AES];
             System.arraycopy(iv, 0, subIv, 0, MIN_IV_SIZE_AES);
-        }else{
+        } else {
             subIv = iv;
         }
 
-        if (CryptoParam.WorkModel.ECB == param.getWorkModel()) {
+        if (SymmetricBuilder.WorkModel.ECB == symmetricBuilder.getWorkModel()) {
             cipher.init(model, toKey(subKey));
-        } else if (CryptoParam.WorkModel.GCM == param.getWorkModel()) {
+        } else if (SymmetricBuilder.WorkModel.GCM == symmetricBuilder.getWorkModel()) {
             GCMParameterSpec gcmPs = new GCMParameterSpec(TAG_LEN * Byte.SIZE, subIv);
             SecretKeySpec secretKeySpec = new SecretKeySpec(subKey, current().getCode());
             cipher.init(model, secretKeySpec, gcmPs);

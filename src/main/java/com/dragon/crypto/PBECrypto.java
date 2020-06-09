@@ -1,6 +1,9 @@
 package com.dragon.crypto;
 
 import com.dragon.crypto.Assert;
+import com.dragon.crypto.builder.BasicBuilder;
+import com.dragon.crypto.builder.PBEBuilder;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -22,7 +25,7 @@ public abstract class PBECrypto implements Crypto {
 
     private static final int SALT_SIZE = 8;
 
-    private static final int CYCLE_TIMES = 1000;
+    private static final int DEFAULT_CYCLE_TIMES = 1000;
 
     @Override
     public SecretKey toKey(final String key) {
@@ -36,46 +39,49 @@ public abstract class PBECrypto implements Crypto {
     }
 
     @Override
-    public byte[] decrypt(CryptoParam param) {
-        return crypt(param, Cipher.DECRYPT_MODE);
+    public byte[] decrypt(BasicBuilder builder) {
+        return crypt(builder, Cipher.DECRYPT_MODE);
     }
 
     @Override
-    public byte[] encrypt(CryptoParam param) {
-        return crypt(param, Cipher.ENCRYPT_MODE);
+    public byte[] encrypt(BasicBuilder builder) {
+        return crypt(builder, Cipher.ENCRYPT_MODE);
     }
 
     @Override
     public byte[] decrypt(byte[] data) {
-        return crypt(CryptoParam.builder().data(data).build(), Cipher.DECRYPT_MODE);
+        return crypt(new PBEBuilder().data(data), Cipher.DECRYPT_MODE);
     }
 
     @Override
     public byte[] encrypt(byte[] data) {
-        return crypt(CryptoParam.builder().data(data).build(), Cipher.ENCRYPT_MODE);
+        return crypt(new PBEBuilder().data(data), Cipher.ENCRYPT_MODE);
     }
 
-    private byte[] crypt(CryptoParam param, int mode) {
-        byte[] data = param.getData();
+    private byte[] crypt(BasicBuilder builder, int mode) {
+        Assert.isInstanceOf(PBECrypto.class, builder, "please use PBEBuilder build params.");
+        PBEBuilder pbeBuilder = (PBEBuilder) builder;
+        byte[] data = builder.getData();
         Assert.notEmpty(data, "data is null or empty");
-        setDefault(param);
-        PBEParameterSpec paramSpec = new PBEParameterSpec(param.getSalt().getBytes(), CYCLE_TIMES);
+        setDefault(pbeBuilder);
+        PBEParameterSpec paramSpec = new PBEParameterSpec(pbeBuilder.getSalt().getBytes(), pbeBuilder.getCycleTimes());
         try {
             Cipher cipher = Cipher.getInstance(current().getCode());
-            cipher.init(mode, toKey(param.getKey()), paramSpec);
-            return cipher.doFinal(param.getData());
+            cipher.init(mode, toKey(pbeBuilder.getKey()), paramSpec);
+            return cipher.doFinal(pbeBuilder.getData());
         } catch (Exception e) {
             throw new CryptoException(e.getMessage());
         }
     }
 
-    private CryptoParam setDefault(CryptoParam param) {
-        param.setKey(Utils.isBlank(param.getKey()) ? DEFAULT_KEY : param.getKey());
-        String salt = Utils.isBlank(param.getSalt()) ? DEFAULT_SALT_8 : param.getSalt();
+    private PBEBuilder setDefault(PBEBuilder builder) {
+        builder.setKey(Utils.isBlank(builder.getKey()) ? DEFAULT_KEY : builder.getKey());
+        builder.setCycleTimes(builder.getCycleTimes() == 0 ? DEFAULT_CYCLE_TIMES : builder.getCycleTimes());
+        String salt = Utils.isBlank(builder.getSalt()) ? DEFAULT_SALT_8 : builder.getSalt();
         if (salt.length() != SALT_SIZE) {
             throw new CryptoException("the salt size must be " + SALT_SIZE);
         }
-        param.setSalt(salt);
-        return param;
+        builder.setSalt(salt);
+        return builder;
     }
 }

@@ -1,5 +1,9 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.AsymmetricBuilder;
+import com.dragon.crypto.builder.BasicBuilder;
+import com.dragon.crypto.builder.PBEBuilder;
+import com.dragon.crypto.builder.SymmetricBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
@@ -46,33 +50,33 @@ public final class CryptoHelper {
     //================= 摘要算法 带key =================//
 
     public static String hmacMD5(String data, String key) {
-        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacMD5).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).key(key).build()));
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacMD5).encrypt(new BasicBuilder().data(data.getBytes(DEFAULT_CHARSET)).key(key)));
     }
 
     public static String hmacSHA256(String data, String key) {
-        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacSHA256).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).key(key).build()));
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacSHA256).encrypt(new BasicBuilder().data(data.getBytes(DEFAULT_CHARSET)).key(key)));
     }
 
     public static String hmacSHA384(String data, String key) {
-        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacSHA384).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).key(key).build()));
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacSHA384).encrypt(new BasicBuilder().data(data.getBytes(DEFAULT_CHARSET)).key(key)));
     }
 
     public static String hmacSHA512(String data, String key) {
-        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacSHA512).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).key(key).build()));
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.HmacSHA512).encrypt(new BasicBuilder().data(data.getBytes(DEFAULT_CHARSET)).key(key)));
     }
 
     //================= 摘要算法 带salt =================//
 
     public static String pbkdf2WithHmacSHA256(String data, String salt) {
-        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA256).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt).build()));
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA256).encrypt(new PBEBuilder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt)));
     }
 
     public static String pbkdf2WithHmacSHA512(String data, String salt) {
-        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA512).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt).build()));
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA512).encrypt(new PBEBuilder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt)));
     }
 
     public static String pbkdf2WithHmacSHA1(String data, String salt) {
-        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA1).encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt).build()));
+        return Hex.encodeHexString(CryptoFactory.getCrypto(Algorithm.PBKDF2WithHmacSHA1).encrypt(new PBEBuilder().data(data.getBytes(DEFAULT_CHARSET)).salt(salt)));
     }
 
     //================= 对称加密/解密 工作模式 向量  填充方式 =================//
@@ -99,28 +103,28 @@ public final class CryptoHelper {
         return des3Decrypt(data, key, null, null, null);
     }
 
-    public static String des3Encrypt(String data, String key, String iv, CryptoParam.WorkModel workModel, CryptoParam.Padding padding) {
+    public static String des3Encrypt(String data, String key, String iv, SymmetricBuilder.WorkModel workModel, SymmetricBuilder.Padding padding) {
         byte[] encryt = CryptoFactory.getCrypto(Algorithm.DES3)
-                .encrypt(CryptoParam.builder()
+                .encrypt(new SymmetricBuilder()
                         .data(data.getBytes(DEFAULT_CHARSET))
                         .key(key)
                         .iv(iv)
                         .workModel(workModel)
                         .padding(padding)
-                        .build());
+                        );
         return Base64.encodeBase64URLSafeString(encryt);
     }
 
-    public static String des3Decrypt(String data, String key, String iv, CryptoParam.WorkModel workModel, CryptoParam.Padding padding) {
+    public static String des3Decrypt(String data, String key, String iv, SymmetricBuilder.WorkModel workModel, SymmetricBuilder.Padding padding) {
         byte[] encrypt = Base64.decodeBase64(data);
         byte[] decrypt = CryptoFactory.getCrypto(Algorithm.DES3)
-                .decrypt(CryptoParam.builder()
+                .decrypt(new SymmetricBuilder()
                         .data(encrypt)
                         .key(key)
                         .iv(iv)
                         .workModel(workModel)
                         .padding(padding)
-                        .build());
+                        );
         return new String(decrypt, DEFAULT_CHARSET);
     }
 
@@ -140,91 +144,91 @@ public final class CryptoHelper {
         return aesDecrypt(data, key, null, null, null);
     }
 
-    public static String aesEncrypt(String data, String key, String iv, CryptoParam.WorkModel workModel, CryptoParam.Padding padding) {
+    public static String aesEncrypt(String data, String key, String iv, SymmetricBuilder.WorkModel workModel, SymmetricBuilder.Padding padding) {
         byte[] encryt = CryptoFactory.getCrypto(Algorithm.AES)
-                .encrypt(CryptoParam.builder()
+                .encrypt(new SymmetricBuilder()
                         .data(data.getBytes(DEFAULT_CHARSET))
                         .key(key)
                         .iv(iv)
                         .workModel(workModel)
                         .padding(padding)
-                        .build());
+                        );
         return Base64.encodeBase64URLSafeString(encryt);
     }
 
-    public static String aesDecrypt(String data, String key, String iv, CryptoParam.WorkModel workModel, CryptoParam.Padding padding) {
+    public static String aesDecrypt(String data, String key, String iv, SymmetricBuilder.WorkModel workModel, SymmetricBuilder.Padding padding) {
         byte[] encrypt = Base64.decodeBase64(data);
         byte[] decrypt = CryptoFactory.getCrypto(Algorithm.AES)
-                .decrypt(CryptoParam.builder()
+                .decrypt(new SymmetricBuilder()
                         .data(encrypt)
                         .key(key)
                         .iv(iv)
                         .workModel(workModel)
                         .padding(padding)
-                        .build());
+                        );
         return new String(decrypt, DEFAULT_CHARSET);
     }
 
     public static String encryptByPBEWithMd5AndDes(String data, String key, String salt) {
         byte[] encryt = CryptoFactory.getCrypto(Algorithm.PBEWithMd5AndDes)
-                .encrypt(CryptoParam.builder()
+                .encrypt(new PBEBuilder()
                         .data(data.getBytes(DEFAULT_CHARSET))
                         .key(key)
                         .salt(salt)
-                        .build());
+                        );
         return Base64.encodeBase64URLSafeString(encryt);
     }
 
     public static String decryptByPBEWithMd5AndDes(String data, String key, String salt) {
         byte[] encrypt = Base64.decodeBase64(data);
         byte[] decrypt = CryptoFactory.getCrypto(Algorithm.PBEWithMd5AndDes)
-                .decrypt(CryptoParam.builder()
+                .decrypt(new PBEBuilder()
                         .data(encrypt)
                         .key(key)
                         .salt(salt)
-                        .build());
+                        );
         return new String(decrypt, DEFAULT_CHARSET);
     }
 
     public static String encryptByPBEWithMD5AndTripleDES(String data, String key, String salt) {
         byte[] encryt = CryptoFactory.getCrypto(Algorithm.PBEWithMd5AndTripleDES)
-                .encrypt(CryptoParam.builder()
+                .encrypt(new PBEBuilder()
                         .data(data.getBytes(DEFAULT_CHARSET))
                         .key(key)
                         .salt(salt)
-                        .build());
+                        );
         return Base64.encodeBase64URLSafeString(encryt);
     }
 
     public static String decryptByPBEWithMD5AndTripleDES(String data, String key, String salt) {
         byte[] encrypt = Base64.decodeBase64(data);
         byte[] decrypt = CryptoFactory.getCrypto(Algorithm.PBEWithMd5AndTripleDES)
-                .decrypt(CryptoParam.builder()
+                .decrypt(new PBEBuilder()
                         .data(encrypt)
                         .key(key)
                         .salt(salt)
-                        .build());
+                        );
         return new String(decrypt, DEFAULT_CHARSET);
     }
 
     public static String encryptByPBEWithSHA1AndRC2_40(String data, String key, String salt) {
         byte[] encryt = CryptoFactory.getCrypto(Algorithm.PBEWithSHA1AndRC2_40)
-                .encrypt(CryptoParam.builder()
+                .encrypt(new PBEBuilder()
                         .data(data.getBytes(DEFAULT_CHARSET))
                         .key(key)
                         .salt(salt)
-                        .build());
+                        );
         return Base64.encodeBase64URLSafeString(encryt);
     }
 
     public static String decryptByPBEWithSHA1AndRC2_40(String data, String key, String salt) {
         byte[] encrypt = Base64.decodeBase64(data);
         byte[] decrypt = CryptoFactory.getCrypto(Algorithm.PBEWithSHA1AndRC2_40)
-                .decrypt(CryptoParam.builder()
+                .decrypt(new PBEBuilder()
                         .data(encrypt)
                         .key(key)
                         .salt(salt)
-                        .build());
+                        );
         return new String(decrypt, DEFAULT_CHARSET);
     }
 
@@ -233,28 +237,28 @@ public final class CryptoHelper {
 
     public static String rsaPublicEncrypt(String data, String key) {
         Crypto rsa = CryptoFactory.getCrypto(Algorithm.RSA);
-        byte[] encry = rsa.encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).publicKey(key).build());
+        byte[] encry = rsa.encrypt(new AsymmetricBuilder().data(data.getBytes(DEFAULT_CHARSET)).publicKey(key));
         return Base64.encodeBase64URLSafeString(encry);
     }
 
     public static String rsaPrivateDecrypt(String data, String key) {
         byte[] encrypt = Base64.decodeBase64(data);
         Crypto rsa = CryptoFactory.getCrypto(Algorithm.RSA);
-        byte[] decrypt = rsa.decrypt(CryptoParam.builder().data(encrypt).privateKey(key).build());
+        byte[] decrypt = rsa.decrypt(new AsymmetricBuilder().data(encrypt).privateKey(key));
         return new String(decrypt, DEFAULT_CHARSET);
     }
 
 
     public static String rsaPrivateEncrypt(String data, String key) {
         Crypto rsa = CryptoFactory.getCrypto(Algorithm.RSA);
-        byte[] encry = rsa.encrypt(CryptoParam.builder().data(data.getBytes(DEFAULT_CHARSET)).privateKey(key).build());
+        byte[] encry = rsa.encrypt(new AsymmetricBuilder().data(data.getBytes(DEFAULT_CHARSET)).privateKey(key));
         return Base64.encodeBase64URLSafeString(encry);
     }
 
     public static String rsaPublicDecrypt(String data, String key) {
         byte[] encrypt = Base64.decodeBase64(data);
         Crypto rsa = CryptoFactory.getCrypto(Algorithm.RSA);
-        byte[] decrypt = rsa.decrypt(CryptoParam.builder().data(encrypt).publicKey(key).build());
+        byte[] decrypt = rsa.decrypt(new AsymmetricBuilder().data(encrypt).publicKey(key));
         return new String(decrypt, DEFAULT_CHARSET);
     }
 }

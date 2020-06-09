@@ -4,6 +4,7 @@ import com.dragon.crypto.Algorithm;
 import com.dragon.crypto.Crypto;
 import com.dragon.crypto.CryptoParam;
 import com.dragon.crypto.Assert;
+import com.dragon.crypto.builder.BasicBuilder;
 
 /**
  * @ClassName: CRC32
@@ -15,8 +16,8 @@ import com.dragon.crypto.Assert;
 public class CRC32 implements Crypto {
 
     @Override
-    public byte[] encrypt(CryptoParam param) {
-        byte[] data = param.getData();
+    public byte[] encrypt(BasicBuilder builder) {
+        byte[] data = builder.getData();
         Assert.notEmpty(data, "data is null or empty");
         java.util.zip.CRC32 crc32 = new java.util.zip.CRC32();
         crc32.update(data);
@@ -25,7 +26,7 @@ public class CRC32 implements Crypto {
 
     @Override
     public byte[] encrypt(byte[] data) {
-        return encrypt(CryptoParam.builder().data(data).build());
+        return encrypt(new BasicBuilder().data(data));
     }
 
     @Override

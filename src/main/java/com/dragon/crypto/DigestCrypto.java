@@ -1,5 +1,6 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.BasicBuilder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -10,18 +11,18 @@ import java.security.NoSuchAlgorithmException;
  * @Date: 2020/3/28 15:36
  * @Version V1.0
  */
-public abstract class DigestCrypto implements Crypto{
+public abstract class DigestCrypto implements Crypto {
 
     @Override
-    public byte[] encrypt(CryptoParam param) {
-        byte[] data = param.getData();
+    public byte[] encrypt(BasicBuilder builder) {
+        byte[] data = builder.getData();
         Assert.notEmpty(data, "data is null or empty");
         return getMessageDigest(current()).digest(data);
     }
 
     @Override
     public byte[] encrypt(byte[] data) {
-        return encrypt(CryptoParam.builder().data(data).build());
+        return encrypt(new BasicBuilder().data(data));
     }
 
     /**
@@ -32,13 +33,10 @@ public abstract class DigestCrypto implements Crypto{
      * @Version V1.0
      */
     private MessageDigest getMessageDigest(Algorithm algorithm) {
-        MessageDigest messageDigest;
         try {
-            messageDigest = MessageDigest.getInstance(algorithm.getCode());
+            return MessageDigest.getInstance(algorithm.getCode());
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
+            throw new CryptoException(e.getMessage(), e);
         }
-        return messageDigest;
     }
 }

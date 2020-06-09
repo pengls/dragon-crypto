@@ -1,5 +1,8 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.AsymmetricBuilder;
+import com.dragon.crypto.builder.PBEBuilder;
+import com.dragon.crypto.builder.SymmetricBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.After;
@@ -63,15 +66,15 @@ public class CryptoTest extends Perform {
         String str = "2010202010";
         Crypto aes = CryptoFactory.getCrypto(Algorithm.AES);
         //采用默认key， iv， 工作模式 ，填充方式
-        String miwen = Base64.encodeBase64String(aes.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
+        String miwen = Base64.encodeBase64String(aes.encrypt(new SymmetricBuilder().data(str.getBytes())));
         System.out.println("默认KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
         System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8));
 
         //采用自定义key，iv，工作模式，填充方式
-        miwen = Base64.encodeBase64String(aes.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.GCM).padding(CryptoParam.Padding.PKCS5Padding).build()));
+        miwen = Base64.encodeBase64String(aes.encrypt(new SymmetricBuilder().data(str.getBytes()).key(key).iv(iv).workModel(SymmetricBuilder.WorkModel.GCM).padding(SymmetricBuilder.Padding.PKCS5Padding)));
         System.out.println("指定KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
-        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
-                .iv(iv).workModel(CryptoParam.WorkModel.GCM).padding(CryptoParam.Padding.PKCS5Padding).build()), StandardCharsets.UTF_8));
+        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(new SymmetricBuilder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
+                .iv(iv).workModel(SymmetricBuilder.WorkModel.GCM).padding(SymmetricBuilder.Padding.PKCS5Padding)), StandardCharsets.UTF_8));
     }
 
     @Test
@@ -80,15 +83,15 @@ public class CryptoTest extends Perform {
         String iv = "K*&^%09P..iqx";
         Crypto des = CryptoFactory.getCrypto(Algorithm.DES);
         //采用默认key， iv， 工作模式 ，填充方式
-        String miwen = Base64.encodeBase64String(des.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
+        String miwen = Base64.encodeBase64String(des.encrypt(new SymmetricBuilder().data(str.getBytes())));
         System.out.println("默认KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
         System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8));
 
         //采用自定义key，iv，工作模式，填充方式
-        miwen = Base64.encodeBase64String(des.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()));
+        miwen = Base64.encodeBase64String(des.encrypt(new SymmetricBuilder().data(str.getBytes()).key(key).iv(iv).workModel(SymmetricBuilder.WorkModel.OFB).padding(SymmetricBuilder.Padding.PKCS5Padding)));
         System.out.println("指定KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
-        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
-                .iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()), StandardCharsets.UTF_8));
+        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(new SymmetricBuilder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
+                .iv(iv).workModel(SymmetricBuilder.WorkModel.OFB).padding(SymmetricBuilder.Padding.PKCS5Padding)), StandardCharsets.UTF_8));
     }
     @Test
     public void des3Test() {
@@ -96,23 +99,23 @@ public class CryptoTest extends Perform {
         String iv = "K*&^%09P..iqx";
         Crypto des = CryptoFactory.getCrypto(Algorithm.DES3);
         //采用默认key， iv， 工作模式 ，填充方式
-        String miwen = Base64.encodeBase64String(des.encrypt(CryptoParam.builder().data(str.getBytes()).build()));
+        String miwen = Base64.encodeBase64String(des.encrypt(new SymmetricBuilder().data(str.getBytes())));
         System.out.println("默认KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
         System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))), StandardCharsets.UTF_8));
 
         //采用自定义key，iv，工作模式，填充方式
-        miwen = Base64.encodeBase64String(des.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()));
+        miwen = Base64.encodeBase64String(des.encrypt(new SymmetricBuilder().data(str.getBytes()).key(key).iv(iv).workModel(SymmetricBuilder.WorkModel.OFB).padding(SymmetricBuilder.Padding.PKCS5Padding)));
         System.out.println("指定KEY,IV,工作模式,填充方式加密：" + miwen + "--" + miwen.length());
-        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
-                .iv(iv).workModel(CryptoParam.WorkModel.OFB).padding(CryptoParam.Padding.PKCS5Padding).build()), StandardCharsets.UTF_8));
+        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(des.decrypt(new SymmetricBuilder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
+                .iv(iv).workModel(SymmetricBuilder.WorkModel.OFB).padding(SymmetricBuilder.Padding.PKCS5Padding)), StandardCharsets.UTF_8));
     }
 
     @Test
     public void pbeTest() {
         Crypto pbe = CryptoFactory.getCrypto(Algorithm.PBEWithMd5AndDes);
-        String miwen = Base64.encodeBase64String(pbe.encrypt(CryptoParam.builder().data(str.getBytes()).key("sdsddssd").salt("sdsdsds2").build()));
+        String miwen = Base64.encodeBase64String(pbe.encrypt(new PBEBuilder().data(str.getBytes()).key("sdsddssd").salt("sdsdsds2")));
         System.out.println(miwen);
-        System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(pbe.decrypt(CryptoParam.builder().key("sdsddssd").salt("sdsdsds2").data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).build()), StandardCharsets.UTF_8));
+        System.out.println("默认KEY,IV,工作模式,填充方式解密：" + new String(pbe.decrypt(new PBEBuilder().key("sdsddssd").salt("sdsdsds2").data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8)))), StandardCharsets.UTF_8));
     }
     /*
      *
@@ -144,9 +147,9 @@ public class CryptoTest extends Perform {
         System.out.println(encrypt);
         System.out.println(pbe.decryptString(encrypt));
 
-        encrypt = pbe.encryptString(CryptoParam.builder().data(str).key(key).salt("12345678").build());
+        encrypt = pbe.encryptString(CryptoParam.builder().data(str).key(key).salt("12345678"));
         System.out.println(encrypt);
-        System.out.println(pbe.decryptString(CryptoParam.builder().data(encrypt).key(key).salt("12345678").build()));
+        System.out.println(pbe.decryptString(CryptoParam.builder().data(encrypt).key(key).salt("12345678")));
 
     }*/
 
@@ -156,10 +159,10 @@ public class CryptoTest extends Perform {
         System.out.println("===========生成密钥对===========\n->PublickKey \n" + keyPairs.getPublicKey() + "\n->PrivateKey \n" + keyPairs.getPrivateKey());
         Crypto rsa = CryptoFactory.getCrypto(Algorithm.RSA);
         //公钥加密，私钥解密
-        byte[] encry = rsa.encrypt(CryptoParam.builder().data(str.getBytes()).publicKey(keyPairs.getPublicKey()).build());
+        byte[] encry = rsa.encrypt(new AsymmetricBuilder().data(str.getBytes()).publicKey(keyPairs.getPublicKey()));
         System.out.println("公钥加密：" + Hex.encodeHexString(encry));
 
-        byte[] decry = rsa.decrypt(CryptoParam.builder().data(encry).privateKey(keyPairs.getPrivateKey()).build());
+        byte[] decry = rsa.decrypt(new AsymmetricBuilder().data(encry).privateKey(keyPairs.getPrivateKey()));
         System.out.println("私钥解密：" + new String(decry));
 
 

@@ -1,8 +1,5 @@
 package com.dragon.crypto;
 
-import org.apache.commons.codec.binary.Base64;
-
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -43,20 +40,10 @@ public class ThreadTest {
     }
 
     private static void encryptAndDecryptByAES(int loop) {
-        for (int i = 0; i < loop; i++) {
-            String miwen = Base64.encodeBase64String(aes.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.GCM).padding(CryptoParam.Padding.NoPadding).build()));
-            String mingwen = new String(aes.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
-                    .iv(iv).workModel(CryptoParam.WorkModel.GCM).padding(CryptoParam.Padding.NoPadding).build()), StandardCharsets.UTF_8);
-            System.out.println(String.format("%s,%s,%s", Thread.currentThread().getName(), miwen, mingwen));
-        }
+
     }
 
     private static void encryptAndDecryptByDES(int loop) {
-        for (int i = 0; i < loop; i++) {
-            String miwen = Base64.encodeBase64String(des.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.CBC).padding(CryptoParam.Padding.PKCS5Padding).build()));
-            String mingwen = new String(des.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
-                    .iv(iv).workModel(CryptoParam.WorkModel.CBC).padding(CryptoParam.Padding.PKCS5Padding).build()), StandardCharsets.UTF_8);
-            System.out.println(String.format("%s,%s,%s", Thread.currentThread().getName(), miwen, mingwen));
-        }
+
     }
 }

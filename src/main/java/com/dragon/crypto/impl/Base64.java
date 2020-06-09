@@ -2,7 +2,7 @@ package com.dragon.crypto.impl;
 
 import com.dragon.crypto.Algorithm;
 import com.dragon.crypto.Crypto;
-import com.dragon.crypto.CryptoParam;
+import com.dragon.crypto.builder.BasicBuilder;
 
 /**
  * @ClassName: Base64
@@ -13,13 +13,13 @@ import com.dragon.crypto.CryptoParam;
  */
 public class Base64 implements Crypto {
     @Override
-    public byte[] encrypt(CryptoParam param) {
-        return org.apache.commons.codec.binary.Base64.encodeBase64URLSafe(param.getData());
+    public byte[] encrypt(BasicBuilder builder) {
+        return org.apache.commons.codec.binary.Base64.encodeBase64URLSafe(builder.getData());
     }
 
     @Override
-    public byte[] decrypt(CryptoParam param) {
-        return org.apache.commons.codec.binary.Base64.decodeBase64(param.getData());
+    public byte[] decrypt(BasicBuilder builder) {
+        return org.apache.commons.codec.binary.Base64.decodeBase64(builder.getData());
     }
 
     @Override

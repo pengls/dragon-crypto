@@ -1,5 +1,6 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.SymmetricBuilder;
 import org.junit.Test;
 
 import java.util.Random;
@@ -45,9 +46,9 @@ public class CryptoHelperTest extends Perform{
         System.out.println(miwen);
         System.out.println(CryptoHelper.des3Decrypt(miwen, des_key));
 
-        miwen = CryptoHelper.des3Encrypt(ming, des_key, des_iv, CryptoParam.WorkModel.PCBC, CryptoParam.Padding.ISO10126Padding);
+        miwen = CryptoHelper.des3Encrypt(ming, des_key, des_iv, SymmetricBuilder.WorkModel.PCBC, SymmetricBuilder.Padding.ISO10126Padding);
         System.out.println(miwen);
-        System.out.println(CryptoHelper.des3Decrypt(miwen, des_key, des_iv, CryptoParam.WorkModel.PCBC, CryptoParam.Padding.ISO10126Padding));
+        System.out.println(CryptoHelper.des3Decrypt(miwen, des_key, des_iv, SymmetricBuilder.WorkModel.PCBC, SymmetricBuilder.Padding.ISO10126Padding));
     }
 
     /**
@@ -63,9 +64,9 @@ public class CryptoHelperTest extends Perform{
         System.out.println(miwen);
         System.out.println(CryptoHelper.aesDecrypt(miwen, aes_key));
 
-        miwen = CryptoHelper.aesEncrypt(ming, aes_key, aes_iv, CryptoParam.WorkModel.PCBC, CryptoParam.Padding.ISO10126Padding);
+        miwen = CryptoHelper.aesEncrypt(ming, aes_key, aes_iv, SymmetricBuilder.WorkModel.PCBC, SymmetricBuilder.Padding.ISO10126Padding);
         System.out.println(miwen);
-        System.out.println(CryptoHelper.aesDecrypt(miwen, aes_key, aes_iv, CryptoParam.WorkModel.PCBC, CryptoParam.Padding.ISO10126Padding));
+        System.out.println(CryptoHelper.aesDecrypt(miwen, aes_key, aes_iv, SymmetricBuilder.WorkModel.PCBC, SymmetricBuilder.Padding.ISO10126Padding));
     }
 
     /**

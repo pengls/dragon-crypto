@@ -1,5 +1,7 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.BasicBuilder;
+
 import javax.crypto.Mac;
 /**
  * @ClassName: HmacCrypto
@@ -11,24 +13,24 @@ import javax.crypto.Mac;
 public abstract class HmacCrypto implements Crypto{
 
     @Override
-    public byte[] encrypt(CryptoParam param) {
-        return mac(param);
+    public byte[] encrypt(BasicBuilder builder) {
+        return mac(builder);
     }
 
     @Override
     public byte[] encrypt(byte[] data) {
-        return encrypt(CryptoParam.builder().data(data).build());
+        return encrypt(new BasicBuilder().data(data));
     }
 
 
-    private byte[] mac(CryptoParam param) {
-        byte[] data = param.getData();
+    private byte[] mac(BasicBuilder builder) {
+        byte[] data = builder.getData();
         Assert.notEmpty(data, "data is null or empty");
-        String key = Utils.isBlank(param.getKey()) ? DEFAULT_KEY : param.getKey();
+        String key = Utils.isBlank(builder.getKey()) ? DEFAULT_KEY : builder.getKey();
         try {
             Mac mac = Mac.getInstance(current().getCode());
             mac.init(toKey(key));
-            return mac.doFinal(param.getData());
+            return mac.doFinal(data);
         } catch (Exception e) {
             throw new CryptoException(e.getMessage());
         }

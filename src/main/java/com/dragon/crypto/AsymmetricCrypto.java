@@ -1,6 +1,9 @@
 package com.dragon.crypto;
 
 import com.dragon.crypto.Assert;
+import com.dragon.crypto.builder.AsymmetricBuilder;
+import com.dragon.crypto.builder.BasicBuilder;
+import com.dragon.crypto.builder.SymmetricBuilder;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
@@ -18,57 +21,57 @@ import java.security.spec.X509EncodedKeySpec;
  * @Version V1.0
  */
 public abstract class AsymmetricCrypto implements Crypto {
-
-    //private static final String DEFAULT_PUBLICK_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDRSIxHVvhRsxfAv7-96XmeXIMl_ehWYI90KMV3BCGl3uFcr8zBaPTV3OhfE3zhQmG48IyUXV6DUkZYDUPmm6HCFfp--svqw9ju0U3TlzzykIvg5x5yRxrGAbVXQjgWKsbk6xRFzJRq3azHWz0qQ4QodA2SiTY8Y1aeHWqJqVRqeQIDAQAB";
-    //private static final String DEFAULT_PRIVATE_KEY = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBANFIjEdW-FGzF8C_v73peZ5cgyX96FZgj3QoxXcEIaXe4VyvzMFo9NXc6F8TfOFCYbjwjJRdXoNSRlgNQ-abocIV-n76y-rD2O7RTdOXPPKQi-DnHnJHGsYBtVdCOBYqxuTrFEXMlGrdrMdbPSpDhCh0DZKJNjxjVp4daompVGp5AgMBAAECgYAL3qZ-IVOiJpsxRm7UkZphPfP-QqFbzMw2FV3luylBZBu6Cwp86bwBKS9QvSU3DXHHcHU4sPb8Ub1FnzL7sFYDNsMTXcDq4P8D74vPbQHTlsbuNSOYXTdTs-qBU24ci2kZq7LeNlBIYcKtr8KmrLyhq3UtLS_AcKFhpvswnt3wNQJBAOwCZcaxz2lfiIrH6pf_DgtzKiOM7qWfk8Pi5yLehdWuysNZT5isuNPqr7spgeg5JUkskPyC-A8d77aRHw5NCPMCQQDjAqCM3AJKKJ3RLnGVktcvlvVu7_kSYoufH_jW3Zg3gNoeDRBuRmqdNefMIdDCGVO-EhGSa_DCkV6w5fqLs1njAkEA58Rm_FxLiniF13wB9mhD-5yKCkVxavauHtUqFQUfuzue5X5Ee3NLQtka4Bsf9tR_uD9q1n8raXUFnm0faWTfXwJAU9bIjL1EazcM8hCBCoisyHqsMkiWaF_UyPP55wD4EqeX5rlUdCW1glJCRXXHr6fC8dOigb0zsegWXKbTHX0jmQJBALVIPQPxJN_oxswZnrRGTAOjkCjKj3D2QAKt71oEqPqYo-76g7vHMX4HrBmU3UyCCNWUm_TBhgcJojJ9krbe6YE";
-
     @Override
-    public byte[] encrypt(CryptoParam param) {
-        return encry(param);
+    public byte[] encrypt(BasicBuilder builder) {
+        return encry(builder);
     }
 
     @Override
-    public byte[] decrypt(CryptoParam param) {
-        return decry(param);
+    public byte[] decrypt(BasicBuilder builder) {
+        return decry(builder);
     }
 
     @Override
     public byte[] encrypt(byte[] data) {
-        return encrypt(CryptoParam.builder().data(data).build());
+        return encrypt(new AsymmetricBuilder().data(data));
     }
 
     @Override
     public byte[] decrypt(byte[] data) {
-        return decrypt(CryptoParam.builder().data(data).build());
+        return decrypt(new AsymmetricBuilder().data(data));
     }
 
-    private byte[] decry(CryptoParam param) {
-        byte[] data = param.getData();
+    private byte[] decry(BasicBuilder builder) {
+        Assert.isInstanceOf(AsymmetricBuilder.class, builder, "please use AsymmetricBuilder build params.");
+        AsymmetricBuilder asymmetricBuilder = (AsymmetricBuilder) builder;
+        byte[] data = asymmetricBuilder.getData();
         Assert.notEmpty(data, "data is null or empty");
-        checkKey(param);
-        if (Utils.isNotBlank(param.getPublicKey())) {
-            return decryptByPublicKey(param.getData(), Base64.decodeBase64(param.getPublicKey()));
+        checkKey(asymmetricBuilder);
+        if (Utils.isNotBlank(asymmetricBuilder.getPublicKey())) {
+            return decryptByPublicKey(asymmetricBuilder.getData(), Base64.decodeBase64(asymmetricBuilder.getPublicKey()));
         }
-        if (Utils.isNotBlank(param.getPrivateKey())) {
-            return decryptByPrivateKey(param.getData(), Base64.decodeBase64(param.getPrivateKey()));
+        if (Utils.isNotBlank(asymmetricBuilder.getPrivateKey())) {
+            return decryptByPrivateKey(asymmetricBuilder.getData(), Base64.decodeBase64(asymmetricBuilder.getPrivateKey()));
         }
         return null;
     }
 
-    private void checkKey(CryptoParam param) {
-        if (Utils.isAllBlank(param.getPrivateKey(), param.getPublicKey())) {
+    private void checkKey(AsymmetricBuilder asymmetricBuilder) {
+        if (Utils.isAllBlank(asymmetricBuilder.getPrivateKey(), asymmetricBuilder.getPublicKey())) {
             throw new CryptoException("the key(private or public) must not be null !");
         }
     }
 
-    private byte[] encry(CryptoParam param) {
-        byte[] data = param.getData();
+    private byte[] encry(BasicBuilder builder) {
+        Assert.isInstanceOf(AsymmetricBuilder.class, builder, "please use AsymmetricBuilder build params.");
+        AsymmetricBuilder asymmetricBuilder = (AsymmetricBuilder) builder;
+        byte[] data = asymmetricBuilder.getData();
         Assert.notEmpty(data, "data is null or empty");
-        if (Utils.isNotBlank(param.getPublicKey())) {
-            return encryptByPublicKey(param.getData(), Base64.decodeBase64(param.getPublicKey()));
+        if (Utils.isNotBlank(asymmetricBuilder.getPublicKey())) {
+            return encryptByPublicKey(asymmetricBuilder.getData(), Base64.decodeBase64(asymmetricBuilder.getPublicKey()));
         }
-        if (Utils.isNotBlank(param.getPrivateKey())) {
-            return encryptByPrivateKey(param.getData(), Base64.decodeBase64(param.getPrivateKey()));
+        if (Utils.isNotBlank(asymmetricBuilder.getPrivateKey())) {
+            return encryptByPrivateKey(asymmetricBuilder.getData(), Base64.decodeBase64(asymmetricBuilder.getPrivateKey()));
         }
         return null;
     }

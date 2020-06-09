@@ -1,5 +1,8 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.BasicBuilder;
+import com.dragon.crypto.builder.PBEBuilder;
+
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.nio.ByteBuffer;
@@ -20,20 +23,22 @@ public abstract class PBKDF2Crypto implements Crypto {
     protected static final String DEFAULT_SALT_32 = "ks*&%$)1sd123sdxplkju+_)(23&^ysh";
 
     @Override
-    public byte[] encrypt(CryptoParam param) {
-        return pbkdf2(param);
+    public byte[] encrypt(BasicBuilder builder) {
+        return pbkdf2(builder);
     }
 
     @Override
     public byte[] encrypt(byte[] data) {
-        return encrypt(CryptoParam.builder().data(data).build());
+        return encrypt(new PBEBuilder().data(data));
     }
 
 
-    private byte[] pbkdf2(CryptoParam param) {
-        byte[] data = param.getData();
+    private byte[] pbkdf2(BasicBuilder builder) {
+        Assert.isInstanceOf(PBEBuilder.class, builder, "please use PBEBuilder build params.");
+        PBEBuilder pbeBuilder = (PBEBuilder) builder;
+        byte[] data = pbeBuilder.getData();
         Assert.notEmpty(data, "data is null or empty");
-        String salt = Utils.isBlank(param.getSalt()) ? DEFAULT_SALT_32 : param.getSalt();
+        String salt = Utils.isBlank(pbeBuilder.getSalt()) ? DEFAULT_SALT_32 : pbeBuilder.getSalt();
         try {
             KeySpec spec = new PBEKeySpec(getChars(data), salt.getBytes(StandardCharsets.UTF_8), CYCLE_TIMES, 256);
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(current().getCode());

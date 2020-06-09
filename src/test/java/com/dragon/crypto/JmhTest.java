@@ -1,5 +1,7 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.PBEBuilder;
+import com.dragon.crypto.builder.SymmetricBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
@@ -41,29 +43,29 @@ public class JmhTest {
     //@Benchmark
     public void des(){
         Crypto des = CryptoFactory.getCrypto(Algorithm.DES);
-        System.out.println(Base64.encodeBase64String(des.encrypt(CryptoParam.builder().data(str.getBytes()).build())));
+        System.out.println(Base64.encodeBase64String(des.encrypt(new SymmetricBuilder().data(str.getBytes()))));
     }
     //@Benchmark
     public void des3(){
         Crypto des = CryptoFactory.getCrypto(Algorithm.DES3);
-        System.out.println(Base64.encodeBase64String(des.encrypt(CryptoParam.builder().data(str.getBytes()).build())));
+        System.out.println(Base64.encodeBase64String(des.encrypt(new SymmetricBuilder().data(str.getBytes()))));
     }
     @Benchmark
     public void aes(){
         Crypto aes = CryptoFactory.getCrypto(Algorithm.AES);
-        String miwen = Base64.encodeBase64String(aes.encrypt(CryptoParam.builder().data(str.getBytes()).key(key).iv(iv).workModel(CryptoParam.WorkModel.GCM).padding(CryptoParam.Padding.NoPadding).build()));
-        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(CryptoParam.builder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
-                .iv(iv).workModel(CryptoParam.WorkModel.GCM).padding(CryptoParam.Padding.NoPadding).build()), StandardCharsets.UTF_8));
+        String miwen = Base64.encodeBase64String(aes.encrypt(new SymmetricBuilder().data(str.getBytes()).key(key).iv(iv).workModel(SymmetricBuilder.WorkModel.GCM).padding(SymmetricBuilder.Padding.NoPadding)));
+        System.out.println("指定KEY,IV,工作模式,填充方式解密：" + new String(aes.decrypt(new SymmetricBuilder().data(Base64.decodeBase64(miwen.getBytes(StandardCharsets.UTF_8))).key(key)
+                .iv(iv).workModel(SymmetricBuilder.WorkModel.GCM).padding(SymmetricBuilder.Padding.NoPadding)), StandardCharsets.UTF_8));
     }
     //@Benchmark
     public void pBEWithMd5AndDes(){
         Crypto pbe = CryptoFactory.getCrypto(Algorithm.PBEWithMd5AndDes);
-        Base64.encodeBase64(pbe.encrypt(CryptoParam.builder().data(str.getBytes()).key("sdsddssd").salt("sdsdsds2").build()));
+        Base64.encodeBase64(pbe.encrypt(new PBEBuilder().data(str.getBytes()).key("sdsddssd").salt("sdsdsds2")));
     }
     //@Benchmark
     public void pBEWithMd5AndTripleDES(){
         Crypto pbe = CryptoFactory.getCrypto(Algorithm.PBEWithMd5AndTripleDES);
-        System.out.println(Base64.encodeBase64String(pbe.encrypt(CryptoParam.builder().data(str.getBytes()).key("sdsddssd").salt("sdsdsds2").build())));
+        System.out.println(Base64.encodeBase64String(pbe.encrypt(new PBEBuilder().data(str.getBytes()).key("sdsddssd").salt("sdsdsds2"))));
     }
 
     public static void main(String[] args) throws RunnerException {

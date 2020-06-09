@@ -1,5 +1,7 @@
 package com.dragon.crypto;
 
+import com.dragon.crypto.builder.BasicBuilder;
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.Charset;
@@ -26,7 +28,7 @@ public interface Crypto {
      * @Date: 2020/4/1 22:24
      * @Version V1.0
      */
-    byte[] encrypt(CryptoParam param);
+    byte[] encrypt(BasicBuilder builder);
 
     byte[] encrypt(byte[] bytes);
 
@@ -37,7 +39,7 @@ public interface Crypto {
      * @Date: 2020/3/28 23:16
      * @Version V1.0
      */
-    default byte[] decrypt(CryptoParam param) {
+    default byte[] decrypt(BasicBuilder builder) {
         throw new CryptoException("Unsupported Method !");
     }
 
